@@ -12,6 +12,29 @@ library(shinyRGL)
 library(rglwidget)
 
 shinyServer(function(input,output,session){
+  # LOGIN
+  logged_in <- reactiveVal(FALSE)
+  
+  # switch value of logged_in variable to TRUE after login succeeded
+  observeEvent(input$login, {
+    logged_in(ifelse(logged_in(), FALSE, TRUE))
+    shinyalert(
+      title = "What is your name?", type = "input",
+      callbackR = function(value) { shinyalert(paste("Welcome", value)) })
+  })
+  
+  # show "Login" or "Logout" depending on whether logged out or in
+  output$logintext <- renderText({
+    if(logged_in()) return("Logout here.")
+    return("Login here")
+  })
+  
+  # show text of logged in user
+  output$logged_user <- renderText({
+    if(logged_in()) return("Welcome, USER")
+    return("")
+  })
+  
   # SIDEBAR
   
   # Make collapsible
@@ -37,8 +60,7 @@ shinyServer(function(input,output,session){
       sidebarMenu(
         menuItem("CATMAID", tabName = "tab_catmaid", icon = icon("server")),
         menuItem("Data Input", icon = icon("angle-up"), tabName = "tab_input"),
-        menuItem("Analysis & Manipulation", icon = icon("th"), tabName = "tab_analysis", badgeLabel = "new",
-                 badgeColor = "green"),
+        menuItem("Analysis & Manipulation", icon = icon("th"), tabName = "tab_analysis"),
         menuItem("Plotting", icon = icon("bar-chart-o"),
                  menuSubItem("Morphology", tabName = "plotting_subitem1"),
                  menuSubItem("Quantit", tabName = "plotting_subitem2")),

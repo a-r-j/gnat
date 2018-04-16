@@ -9,17 +9,25 @@ library(dashboardthemes)
 library(rgl)
 library(shinyRGL)
 library(rglwidget)
+library(colourpicker)
+library(shinyalert)
 # Use *Input() to create interactive input functions
 # Use *Output() to place output areas in app UI
 # Outputs built in server function
 # Render functions place R objects into output areas designated in the UIinsta
 
 dashboardPage(skin="black",
-  dashboardHeader(title="Gnat"),
-  dashboardSidebar(sidebarMenuOutput("Semi_collapsible_sidebar")
-                   ),
+  dashboardHeader(title="Gnat",
+                  tags$li(class = "dropdown",
+                         tags$li(class = "dropdown", textOutput("logged_user"), style = "padding-top: 15px; padding-bottom: 15px; color: black;"),
+                         tags$li(class = "dropdown", actionLink("login", textOutput("logintext"))))
+                  ),
+  dashboardSidebar(sidebarMenuOutput("Semi_collapsible_sidebar")),
   dashboardBody(tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "style.css")),
                 #shinyDashboardThemes(theme = "grey_dark"),
+                useShinyalert(),  # Set up shinyalert
+                #actionButton("preview", "Preview"),
+                
                 tabItems(
                   tabItem(tabName = "tab_catmaid",
                   fluidRow(
@@ -142,7 +150,12 @@ dashboardPage(skin="black",
           fluidRow(
             box(title = "3D Viewer", width = 5, status = "primary",height = "800px",
                 rglwidgetOutput("view3d_pairwise", width="100%", height="750px")),
-            box(title = "Plot Parameters", width = 7, status = "primary")
+            box(title = "Plot Parameters", width = 7, status = "primary",
+                fluidRow(
+                  selectizeInput(inputId = "plot_skid_input", label = "Add to Plot", choices = ""),
+                  colourInput("col", "Select colour", "yellow")
+                )
+                )
           ),
           
           
