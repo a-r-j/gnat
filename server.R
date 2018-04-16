@@ -35,6 +35,19 @@ shinyServer(function(input,output,session){
     return("")
   })
   
+  login<- reactiveValues()
+  login$submit=FALSE
+  observeEvent(input$Login,
+               {
+                # login$submi!!=input$Login
+                 catmaid_conn = catmaid_login(
+                   input$catmaid_login_server,
+                   input$catmiad_login_token,
+                   input$catmaid_login_authname,
+                   input$catmaid_login_authpassword
+                 )
+               })
+
   # SIDEBAR
   
   # Make collapsible
@@ -62,18 +75,13 @@ shinyServer(function(input,output,session){
         menuItem("Data Input", icon = icon("angle-up"), tabName = "tab_input"),
         menuItem("Analysis & Manipulation", icon = icon("th"), tabName = "tab_analysis"),
         menuItem("Plotting", icon = icon("bar-chart-o"),
-                 menuSubItem("Morphology", tabName = "plotting_subitem1"),
-                 menuSubItem("Quantit", tabName = "plotting_subitem2")),
+                 menuSubItem("Morphology", tabName = "plotting_morphology"),
+                 menuSubItem("Quant", tabName = "plotting_quant")),
         menuItem("Data Output", icon = icon("angle-down"), tabName = "tab_output"),
         menuItem("R editor", icon = icon("code"), tabName = "tab_editor"))
   })
   
-  # R CONSOLE
-  
-  # thedata <- reactive({
-  #   data.frame(V1 = rnorm(input$n),
-  #              V2 = rep("A",input$n))
-  # })
+
   
   # Render 3D Widgets
   output$view3d_pairwise <- renderRglwidget({
@@ -84,36 +92,26 @@ shinyServer(function(input,output,session){
     rglwidget()
   })
   
+  output$plot_selections <- DT::renderDataTable(mtcars, filter="top", options=list(autoWidth=TRUE))
+  
+  # R CONSOLE
+  
+  # thedata <- reactive({
+  #   data.frame(V1 = rnorm(input$n),
+  #              V2 = rep("A",input$n))
+  # })
+  
   output$output <- renderPrint({
     input$eval
     return(isolate(eval(parse(text=input$code))))
   }) 
   
-  # Global Environment
+  # GLOBAL ENVIRONMENT
   
   # Filter data based on selections
   currentVars <- reactive({cbind(objects(), objects())})
   
   # Produce global environment table
   output$table <- DT::renderDataTable(currentVars)
+ 
 })
-
-
-
-# server <- function(input, output, session) {
-#   catmiad_conn = catmaid_login(
-#     input$catmaid_login_server,
-#     input$catmiad_login_token,
-#     input$catmaid_login_authname,
-#     input$catmaid_login_authpassword
-#   )
-#   
-#   observeEvent(input$toggleSidebar, {
-#     shinyjs::toggle(id = "Sidebar")
-#   })
-#   
-#   # output$neuron_viewer <- renderRglwidget({
-#   #   title = "Neuron Viewer"
-#   #   #plot3d(input$input_neurons)
-#   # })
-# }
