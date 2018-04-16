@@ -5,19 +5,21 @@ library(nat)
 library(catmaid)
 library(ggplot2)
 library(DT)
+library(dashboardthemes)
+library(rgl)
+library(shinyRGL)
+library(rglwidget)
 # Use *Input() to create interactive input functions
 # Use *Output() to place output areas in app UI
 # Outputs built in server function
-# Render functions place R objects into output areas designated in the UI
-
-#fileInput(inputId = "input_neurons", label = "Upload Neurons",
-#          accept = c(".swc", ".json", ".nrrd", ".VTK"), multiple = F),
+# Render functions place R objects into output areas designated in the UIinsta
 
 dashboardPage(skin="black",
   dashboardHeader(title="Gnat"),
   dashboardSidebar(sidebarMenuOutput("Semi_collapsible_sidebar")
                    ),
   dashboardBody(tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "style.css")),
+                #shinyDashboardThemes(theme = "grey_dark"),
                 tabItems(
                   tabItem(tabName = "tab_catmaid",
                   fluidRow(
@@ -105,6 +107,16 @@ dashboardPage(skin="black",
                   )
   )
                 ),
+  tabItem(tabName = "tab_input",
+          column(width = 6,
+                 box(
+                   fileInput(inputId = "input_neurons", label = "Upload Neurons",
+                             accept = c(".swc", ".json", ".nrrd", ".VTK"), multiple = F)
+                 )
+                 
+          )
+  ),
+  
   tabItem(tabName = "tab_analysis",
           column(width = 6,
                  box(
@@ -122,22 +134,25 @@ dashboardPage(skin="black",
                  
           )
           ),
-  tabItem(tabName = "tab_plotting",
-          column(width = 6,
-                 box(
-                   title = "Skeleton Functions", width = NULL, status = "primary",
-                   selectizeInput(inputId = "catmaid_skid_input", label = "Get Compact Skeleton", choices = ""),
-                   HTML("<i>Return the raw data for a CATMAID neuronal skeleton</i>"),
-                   br(),
-                   selectizeInput(inputId = "catmaid_skid_input", label = "Get Treenode Table", choices = ""),
-                   HTML("<i>Return tree node table for a given neuron</i>"),
-                   br(),
-                   selectizeInput(inputId = "catmaid_skid_input", label = "Get Review Status", choices = ""),
-                   HTML("<i>Get review status of neurons from CATMAID</i>"),
-                   br()
-                 )
-                 
-          )
+  tabItem(tabName = "plotting_subitem1",
+          h2("3D view"),
+          #includeCSS("loader.css"),
+          HTML("<div class='loader' style='position: absolute; left: 400px; top: 300px; z-index: -10000;'>Loading...</div>"),
+          HTML("<div style='position: absolute; left: 220px; top: 270px; z-index: -10000; text-align: center; width: 400px; font-size: 30px;'>Loading...</div>"),
+          fluidRow(
+            box(title = "3D Viewer", width = 5, status = "primary",height = "800px",
+                rglwidgetOutput("view3d_pairwise", width="100%", height="750px")),
+            box(title = "Plot Parameters", width = 7, status = "primary")
+          ),
+          
+          
+          conditionalPanel(condition = "output.pairwise_nblast_complete",
+                          h2("NBLAST results"),
+                          textOutput("pairwise_query_target"),
+                          textOutput("pairwise_results"),
+                          HTML("<a href='http://flybrain.mrc-lmb.cam.ac.uk/si/nblast/www/how/'>What do these scores mean?</a>")
+                          )
+
   ),
   tabItem(tabName = "tab_editor",
           aceEditor("code","library(nat) \nlibrary(catmaid) \n", theme = "terminal"),
@@ -150,7 +165,11 @@ dashboardPage(skin="black",
       title = "R Environment",
       # The id lets us use input$tabset1 on the server to find the current tab
       id = "tabset1", height = "250px", width = 12,
-      tabPanel("Console", "First tab content"),
+      tabPanel("Console","console goes here"
+               # fluidRow(aceEditor("code","library(nat) \nlibrary(catmaid) \n", theme = "terminal"),
+               #          actionButton("eval","Evaluate code"),
+               #          verbatimTextOutput("output"))
+               ),
       tabPanel("Variables",
                # Create a new Row in the UI for selectInputs
                # fluidRow(
