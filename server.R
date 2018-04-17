@@ -35,6 +35,9 @@ shinyServer(function(input,output,session){
     return("")
   })
   
+  
+  
+  
   login<- reactiveValues()
   login$submit=FALSE
   observeEvent(input$Login,
@@ -48,6 +51,13 @@ shinyServer(function(input,output,session){
                  )
                })
 
+observeEvent(input$catmaid_skeleton_btn,
+             {
+               assign(input$catmaid_var_name, read.neurons.catmaid(input$catmaid_skid_input))
+             }
+             )  
+  
+  
   # SIDEBAR
   
   # Make collapsible
@@ -88,6 +98,9 @@ shinyServer(function(input,output,session){
     rgl.open(useNULL=T)
     clear3d()
     plot3d(FCWB)
+    observeEvent(input$plot_submit,
+                 {plot3d(get(input$catmaid_var_name), add = T)}
+                 )
     #frontalView()
     rglwidget()
   })

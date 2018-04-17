@@ -12,6 +12,8 @@ library(rglwidget)
 library(colourpicker)
 library(shinyalert)
 library(shinymaterial)
+library(rmarkdown)
+library(shinyAce)
 # Use *Input() to create interactive input functions
 # Use *Output() to place output areas in app UI
 # Outputs built in server function
@@ -25,6 +27,7 @@ material_page(dashboardPage(skin="black",
                             dashboardSidebar(sidebarMenuOutput("Semi_collapsible_sidebar")),
                             dashboardBody(tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "style.css")),
                                           #shinyDashboardThemes(theme = "grey_dark"),
+                                          
                                           useShinyalert(),  # Set up shinyalert
                                           #actionButton("preview", "Preview"),
                                           material_modal(
@@ -160,11 +163,16 @@ material_page(dashboardPage(skin="black",
                                                     #includeCSS("loader.css"),
                                                     HTML("<div class='loader' style='position: absolute; left: 400px; top: 300px; z-index: -10000;'>Loading...</div>"),
                                                     HTML("<div style='position: absolute; left: 220px; top: 270px; z-index: -10000; text-align: center; width: 400px; font-size: 30px;'>Loading...</div>"),
-                                                    fluidRow(
-                                                      column(5,
-                                                             box(title = "3D Viewer", width = "100%", status = "primary",height = "800px",
-                                                                 rglwidgetOutput("view3d_pairwise", width="100%", height="725px"))
-                                                      ),
+                                                    fluidRow(column(5,
+                                                                    tabBox(width="100%", height = "800px",
+                                                                           tabPanel("1",
+                                                                                    #HTML("<div class='loader' style='position: absolute; left: 400px; top: 300px; z-index: -10000;'>Loading...</div>"),
+                                                                                    #HTML("<div style='position: absolute; left: 220px; top: 270px; z-index: -10000; text-align: center; width: 400px; font-size: 30px; text-color: black;'>Loading...</div>"),
+                                                                               
+                                                                                    rglwidgetOutput("view3d_pairwise", width="100%", height="725px"))
+                                                                           )
+                                                                    ),
+                                                      
                                                       column(7,
                                                              box(title = "Plot Parameters", width = "100%", status = "primary",
                                                                  fluidRow(
